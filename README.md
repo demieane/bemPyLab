@@ -6,6 +6,6 @@ The bemPyLab series of lessons is part of a university course (Mathematical Mode
 
 The materials are distributed publicly and openly under a Creative Commons Attribution license, [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 
-# INTRODUCTION TO NUMERICAL METHODS
+# Numerical methods in a nutshell
 
 [An example of FDM](https://nbviewer.jupyter.org/github/demieane/bemPyLab/blob/master/fdm_example1.ipynb)
