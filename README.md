@@ -8,4 +8,4 @@ The materials are distributed publicly and openly under a Creative Commons Attri
 
 # Numerical methods in a nutshell
 
-[An example of FDM](https://nbviewer.jupyter.org/github/demieane/bemPyLab/blob/master/fdm_example1.ipynb)
+[An example of FDM](https://nbviewer.jupyter.org/github/demieane/bemPyLab/blob/master/fdm_example1_v1.ipynb)
