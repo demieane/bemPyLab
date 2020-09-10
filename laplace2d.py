@@ -24,7 +24,7 @@ def lineParametrization(xa, ya, xb, yb, Npanels):
     yline = ya + t*(yb-ya)
     return xline, yline
 
-def boundaryConditions(nx, ny, x, y, xo, yo):
+def funcSourceDerivative(nx, ny, x, y, xo, yo):
     # Neumann BCs
     dPhidn = nx*(x-xo)/((x-xo)**2-(y-yo)**2)+ny*(y-yo)/((x-xo)**2-(y-yo)**2)
     return dPhidn
@@ -65,8 +65,8 @@ def show():
 #===========================MAIN CODE BELOW====================================#
 
 #==============CREATE MESH=====================================================#
-Np = 3 #number of panels
-xo, yo = -2, 0 #source position
+Np = 15 #number of panels
+xo, yo = 0,-2 #source position
 # square domain creation
 xa, ya = 0, 0; xb, yb = 1, 1; xc, yc = 0, 2; xd, yd = -1, 1
 [x1, y1] =lineParametrization(xa, ya, xb, yb, Np)
@@ -85,7 +85,7 @@ plt.grid(linestyle='-', linewidth=0.5)
 #nodes on the boundary with counter-clockwise numbering
 xi =np.concatenate((x1, x2[1:len(x2)], x3[1:len(x3)], x4[1:len(x4)]))
 yi =np.concatenate((y1, y2[1:len(y2)], y3[1:len(y3)], y4[1:len(y4)]))
-print(xi)
+#print(xi)
 #print(yi)
 
 [xcolloc, ycolloc, nx, ny, tx, ty] = collocationScheme(xi, yi)
@@ -93,5 +93,19 @@ print(xi)
 plt.plot(xcolloc, ycolloc, 'gs')
 plt.quiver(xcolloc, ycolloc, nx, ny)
 plt.quiver(xcolloc, ycolloc, tx, ty)
+plt.grid(linestyle='-', linewidth=0.5)
+show()
+
+# analytic solution
+dirichletBC = np.zeros(len(xcolloc))
+neumannBC = np.zeros(len(xcolloc))
+
+for jj in range(len(xcolloc)):
+    dirichletBC[jj] = funcSource(xcolloc[jj], ycolloc[jj], xo, yo)
+    neumannBC[jj] = funcSourceDerivative(nx[jj], ny[jj], xcolloc[jj], ycolloc[jj], xo, yo)
+
+xindex = np.linspace(0, 1, len(xcolloc))
+plt.plot(xindex, dirichletBC, xindex, dirichletBC, 'bo')
+plt.plot(xindex, neumannBC, xindex, neumannBC, 'ko')
 plt.grid(linestyle='-', linewidth=0.5)
 show()
