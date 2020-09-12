@@ -8,6 +8,12 @@ import matplotlib.pyplot as plt
 # Katsikadelis (2002) Boundary elements: Theory and Applications Ch. 3, pp 33
 # Green's theorem and sign convention
 
+# TODO
+# Diaferei kata mia stathera otan lynw to neumann problem
+# otan lunw to dirichlet dn pianei kala tiw gwnies (ginetai kati gia ayto?)
+# ean einai smooth to sunoro ola ok?
+
+
 def funcSource(x, y, xo, yo):
     Phi = np.log(math.sqrt((x-xo)**2 + (y-yo)**2))
     return Phi
@@ -116,7 +122,7 @@ def show():
 #===========================MAIN CODE BELOW====================================#
 
 #==============CREATE MESH=====================================================#
-Np = 1000 #number of panels
+Np = 10 #number of panels
 xo, yo = -2,0 #source position
 # square domain creation
 xa, ya = 1, 0
@@ -194,13 +200,10 @@ for ii in range(0, sizeA): #for each collocation point
         x2, y2 = xi[jj+1], yi[jj+1]
         fi_source = constantStrengthSource(x1, y1, x2, y2, xp, yp) #w
         fi_doublet = constantStrengthDoublet(x1, y1, x2, y2, xp, yp)#dw/dn
-
-        Hij[ii][jj] = fi_doublet
-        if (ii==jj):
-            Hij[ii][jj] = Hij[ii][jj] + 0.5
-
         Gij[ii][jj] = fi_source
-
+        Hij[ii][jj] = fi_doublet
+        if (ii == jj):
+            Hij[ii][jj] = Hij[ii][jj] + 0.5
     utest[ii][0] = dirichletBC[ii]
     ###dudn[ii][0] = neumannBC[ii]
 
