@@ -4,7 +4,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 # solution of Laplace in 2d with neumman boundary conditions
-# with bem
+
+# Katsikadelis (2002) Boundary elements: Theory and Applications Ch. 3, pp 33
+# Green's theorem and sign convention
 
 def funcSource(x, y, xo, yo):
     Phi = np.log(math.sqrt((x-xo)**2 + (y-yo)**2))
@@ -115,17 +117,16 @@ def show():
 
 #==============CREATE MESH=====================================================#
 Np = 10 #number of panels
-xo, yo = 2,0 #source position
+xo, yo = -2,0 #source position
 # square domain creation
 xa, ya = 1, 0
-xb, yb = 0, -1
+xb, yb = 0, 1
 xc, yc = -1, 0
-xd, yd = 0, 1
+xd, yd = 0, -1
 [x1, y1] =lineParametrization(xa, ya, xb, yb, Np)
 [x2, y2] =lineParametrization(xb, yb, xc, yc, Np)
 [x3, y3] =lineParametrization(xc, yc, xd, yd, Np)
 [x4, y4] =lineParametrization(xd, yd, xa, ya, Np)
-
 
 # plot the discretized domain
 plt.plot(xo, yo, 'ks')
@@ -195,16 +196,16 @@ for ii in range(0, sizeA): #for each collocation point
 
         Hij[ii][jj] = fi_doublet
         if (ii==jj):
-            Hij[ii][jj] = Hij[ii][jj] - 0.5
+            Hij[ii][jj] = Hij[ii][jj] + 0.5
 
         Gij[ii][jj] = fi_source
 
     dudn[ii][0] = neumannBC[ii]
 
-print(Hij)
-print(Gij)
+#print(Hij)
+#print(Gij)
 b = np.matmul(Gij, dudn)
-ubem = np.linalg.solve(Hij,b)
+ubem = np.linalg.solve(-Hij,b)
 
 # comparison
 xindex = np.linspace(0, 1, len(xcolloc))
