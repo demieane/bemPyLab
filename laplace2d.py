@@ -116,7 +116,7 @@ def show():
 #===========================MAIN CODE BELOW====================================#
 
 #==============CREATE MESH=====================================================#
-Np = 10 #number of panels
+Np = 1000 #number of panels
 xo, yo = -2,0 #source position
 # square domain creation
 xa, ya = 1, 0
@@ -181,7 +181,8 @@ print(ftest)
 sizeA = len(xcolloc)
 Hij = np.zeros((sizeA, sizeA))
 Gij = np.zeros((sizeA, sizeA))
-dudn = np.zeros((sizeA,1))
+###dudn = np.zeros((sizeA,1))
+utest = np.zeros((sizeA,1))
 #print(len(neumannBC))
 
 for ii in range(0, sizeA): #for each collocation point
@@ -200,17 +201,21 @@ for ii in range(0, sizeA): #for each collocation point
 
         Gij[ii][jj] = fi_source
 
-    dudn[ii][0] = neumannBC[ii]
+    utest[ii][0] = dirichletBC[ii]
+    ###dudn[ii][0] = neumannBC[ii]
 
-#print(Hij)
-#print(Gij)
-b = np.matmul(Gij, dudn)
-ubem = np.linalg.solve(-Hij,b)
+
+###b = np.matmul(Gij, dudn)
+###ubem = np.linalg.solve(-Hij,b)
+b = np.matmul(-Hij, utest)
+ubem = np.linalg.solve(Gij,b)
 
 # comparison
 xindex = np.linspace(0, 1, len(xcolloc))
-plt.plot(xindex, dirichletBC)
-plt.plot(xindex, dirichletBC, 'bo', label='dirichlet data')
+###plt.plot(xindex, dirichletBC)
+###plt.plot(xindex, dirichletBC, 'bo', label='dirichlet data')
+plt.plot(xindex, neumannBC)
+plt.plot(xindex, neumannBC, 'bo', label='neumann data')
 plt.plot(xindex, ubem, 'r*')
 #plt.plot(xindex, neumannBC)
 #plt.plot(xindex, neumannBC,'ko', label='neumann data')
