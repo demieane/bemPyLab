@@ -34,7 +34,7 @@ def constantStrengthSource(x1, y1, x2, y2, xp, yp):
         r2 = math.sqrt((xp-x2)**2+(yp-y2)**2)
         th1 = math.atan2(yip,xip-xi1)
         th2 = math.atan2(yip,xip-xi2)
-
+        # The upper and lower side of the panels have the same fi (continuous)
         fi = (2*(xip-xi1)*math.log(r1) - 2*(xip-xi2)*math.log(r2) -2*(x2-x1) + 2*yip*(th2-th1))/4/math.pi
 
     return fi
@@ -53,6 +53,7 @@ def constantStrengthDoublet(x1, y1, x2, y2, xp, yp):
         th1=math.atan2(yip,xip-xi1);
         th2=math.atan2(yip,xip-xi2);
         fi=-(th2-th1)/2/math.pi;
+        # the value changes if the solve the interior or exterior problem?
     return fi
 
 def lineParametrization(xa, ya, xb, yb, Npanels):
