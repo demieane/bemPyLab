@@ -8,5 +8,6 @@ The materials are distributed publicly and openly under a Creative Commons Attri
 
 Module 1: Numerical methods in a nutshell
 
-- Solving a simple ODE with [FDM](https://nbviewer.jupyter.org/github/demieane/bemPyLab/blob/master/fdm_example1_v1.ipynb)
+- For those who are not familiar with the Python programming language, and quite a bit rusty in terms of using the finite difference method (the holy grail of numerical methods for solving PDEs, we have prepeared [tutorial1-FDM](https://nbviewer.jupyter.org/github/demieane/bemPyLab/blob/master/fdm_example1_v1.ipynb)
+
 - The Dirichlet problem with FEM
