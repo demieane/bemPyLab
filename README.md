@@ -8,6 +8,6 @@ The materials are distributed publicly and openly under a Creative Commons Attri
 
 **Module 1: Numerical methods in a nutshell**
 
-- For those who are not familiar with the Python programming language, and quite a bit rusty in terms of using the finite difference method (perhaps the holy grail of numerical methods for solving PDEs) we have prepeared [tutorial1](https://nbviewer.jupyter.org/github/demieane/bemPyLab/blob/master/fdm_example1_v1.ipynb)
+- For those who are not familiar with the Python programming language, and quite a bit rusty in terms of using the finite difference method (perhaps the holy grail of numerical methods for solving PDEs) we have prepeared [tutorial1]()
 
 - tutorial2: The interior Laplace problem in 2D with Dirichlet boundary conditions: numerical solution using BEM and comparison with the analytic solution
