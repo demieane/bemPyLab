@@ -1,11 +1,15 @@
+#===============================================================================
 import numpy as np
 import math
 import matplotlib
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
-
-# solution of Laplace in 2d with dirichlet boundary conditions
+#===============================================================================
+# COMMENTS: solution of Laplace in 2d with dirichlet boundary conditions
+# Last review at 15-9-2020
+# Written by: Anevlavi Dimitra
+#===============================================================================
 
 def constantStrengthSource(x1, y1, x2, y2, xp, yp):
     # The induced velocity and velocity potential due to SL panel
@@ -88,8 +92,9 @@ def collocationScheme(xi, yi):
 def show():
    return matplotlib.pyplot.show(block=True)
 
+#===============================================================================
 # MAIN CODE
-
+#===============================================================================
 # CREATE MESH FOR SQUARE DOMAIN & BOYNDARY CONDITIONS
 plotMesh = 1
 plotAnalyticSolution = 0
@@ -141,6 +146,7 @@ if (plotBC == 1):
     plt.title('Dirichlet boundary conditions')
     show()
 
+#===============================================================================
 # ANALYTIC SOLUTION PREVIEW
 if (plotAnalyticSolution==1):
     xanal = np.linspace(xa, xb, 100)
@@ -157,7 +163,7 @@ if (plotAnalyticSolution==1):
     ax.set_zlabel('Z axis')
     plt.show()
 
-
+#===============================================================================
 # BOUNDARY ELEMENT METHOD (BEM) BOYNDARY INTEGRAL EQUATION IN MATRIX FORM
 sizeA = len(xcolloc)
 Abij = np.zeros((sizeA, sizeA)) #G
@@ -181,10 +187,11 @@ for ii in range(0, sizeA): #for each collocation point
         A[ii][jj] = 0.5*deltaKronecker + Bbij[ii][jj]
         S[ii][jj] = Abij[ii][jj]
 
+#===============================================================================
 # SOLUTION OF THE LINEAR SYSTEM
 b = np.matmul(A, u_bc)
 dudn_bc = np.linalg.solve(S,b)
-
+#===============================================================================
 # COMPARISON WITH THE ANALYTIC SOLUTION
 xindex = np.linspace(0, 1, len(xcolloc))
 plt.plot(xindex, u_bc)
@@ -195,7 +202,7 @@ plt.xlabel(strLabel);
 plt.legend(bbox_to_anchor=(1.05, 1), loc='upper right', borderaxespad=0.)
 plt.grid(linestyle='-', linewidth=0.5)
 show()
-
+#===============================================================================
 # DOMAIN SOLUTION u(x,y)
 xtest = np.linspace(xa+0.01, xb-0.01, 20)
 ytest = np.linspace(ya+0.01, yc-0.01, 20)
@@ -230,3 +237,4 @@ ax.set_xlabel('X axis')
 ax.set_ylabel('Y axis')
 ax.set_zlabel('Z axis')
 plt.show()
+#===============================================================================
