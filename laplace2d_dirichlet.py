@@ -9,6 +9,9 @@ from matplotlib import cm
 # COMMENTS: solution of Laplace in 2d with dirichlet boundary conditions
 # Last review at 15-9-2020
 # Written by: Anevlavi Dimitra
+#
+# The normal vector direction does not affect the result. What happens with
+# the Neumann problem??
 #===============================================================================
 
 def constantStrengthSource(x1, y1, x2, y2, xp, yp):
@@ -74,19 +77,19 @@ def collocationScheme(xi, yi):
         lpanel = math.sqrt((xi[ii+1]-xi[ii])**2+(yi[ii+1]-yi[ii])**2) #panel length
         sin_theta[ii] = (yi[ii+1]-yi[ii])/lpanel
         cos_theta[ii] = (xi[ii+1]-xi[ii])/lpanel
-        #"""
-        # The normal vector outside the domain
-        nx[ii] = sin_theta[ii]
-        ny[ii] = -cos_theta[ii]
-        tx[ii] = -ny[ii]
-        ty[ii] = nx[ii]
-        """
+
+        ## The normal vector outside the domain
+        #nx[ii] = sin_theta[ii]
+        #ny[ii] = -cos_theta[ii]
+        #tx[ii] = -ny[ii]
+        #ty[ii] = nx[ii]
+
         # The normal vector inside the domain
         nx[ii] = -sin_theta[ii]
         ny[ii] = cos_theta[ii]
         tx[ii] = ny[ii]
         ty[ii] = -nx[ii]
-        """
+
     return xcolloc, ycolloc, nx, ny, tx, ty
 
 def show():
