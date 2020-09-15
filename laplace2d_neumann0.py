@@ -93,10 +93,13 @@ def collocationScheme(xi, yi):
 
     return xcolloc, ycolloc, nx, ny, tx, ty
 
-def analyticSolution(xx,yy):
-    uu = np.zeros((len(xx), len(yy)))
+def analyticSolution(xx,yy, indexType):
+    if (indexType ==2):
+        uu = np.zeros((len(xx), len(yy)))
+    else:
+        uu = np.zeros(len(xx))
     # for the infinite series we take nterms = 10 terms
-    nterms = 20
+    nterms = 10
     PI = math.pi
     for N in range(1, nterms):
         a_n = 2*(1-(-1)**N)/(N**3*PI*math.tanh(N*PI))
@@ -110,15 +113,15 @@ def analyticSolution(xx,yy):
 plotMesh = 1
 plotAnalyticSolution = 1
 plotBC = 1
-plotNumericalSolution = 0
-plotNumResultsBC = 0
+plotNumericalSolution = 1
+plotNumResultsBC = 1
 
-Np =20 #number of nodes
+Np = 300 #number of nodes
 # square domain creation
 xa, ya = 0, 0
 xb, yb = math.pi, 0
-xc, yc = math.pi, 1
-xd, yd = 0, 1
+xc, yc = math.pi, math.pi
+xd, yd = 0, math.pi
 [x1, y1] =lineParametrization(xa, ya, xb, yb, Np) #y=0
 [x2, y2] =lineParametrization(xb, yb, xc, yc, Np) #x=pi
 [x3, y3] =lineParametrization(xc, yc, xd, yd, Np) #y=1
@@ -129,11 +132,16 @@ xi = np.concatenate((x1, x2[1:len(x2)], x3[1:len(x3)], x4[1:len(x4)]))
 yi = np.concatenate((y1, y2[1:len(y2)], y3[1:len(y3)], y4[1:len(y4)]))
 
 [xcolloc, ycolloc, nx, ny, tx, ty] = collocationScheme(xi, yi)
-xcolloc1 = xcolloc[0:(Np-1)]
-xcolloc2 = xcolloc[(Np-1):(2*(Np-1))]
-xcolloc3 = xcolloc[2*(Np-1):3*(Np-1)]
-xcolloc4 = xcolloc[3*(Np-1):len(xcolloc)]
+xcolloc1 = xcolloc[0:(Np-1)];
+ycolloc1 = ycolloc[0:(Np-1)];
 
+xcolloc2 = xcolloc[(Np-1):(2*(Np-1))];
+ycolloc2 = ycolloc[(Np-1):(2*(Np-1))]
+
+xcolloc3 = xcolloc[2*(Np-1):3*(Np-1)];
+ycolloc3 = ycolloc[2*(Np-1):3*(Np-1)]
+
+xcolloc4 = xcolloc[3*(Np-1):len(xcolloc)];
 ycolloc4 = ycolloc[3*(Np-1):len(ycolloc)]
 
 #Boundary conditions
@@ -141,13 +149,19 @@ ycolloc4 = ycolloc[3*(Np-1):len(ycolloc)]
 #   -               -
 #   -               -
 #   A---------------B
-u_bc1 = xcolloc1 #[xa,ya] - [xb, yb]
-u_bc2 = np.zeros(len(xcolloc2)) #[xb,yb] - [xc, yc]
-u_bc3 = xcolloc3 #[xc,yc] - [xd, yd]
-u_bc4 = ycolloc4-math.pi/2 #[xd,yd] - [xa, ya]
 
-u_bc = np.concatenate((u_bc1, u_bc2, u_bc3, u_bc4))
-xindex = np.linspace(0, 1, len(u_bc))
+#indexType = 1
+du1 = xcolloc1*0 #[xa,ya] - [xb, yb]
+#u1 = analyticSolution(xcolloc1, ycolloc1, indexType)
+du2 = xcolloc2*0 #[xb,yb] - [xc, yc]
+#u2 = analyticSolution(xcolloc2, ycolloc2, indexType)
+du3 = xcolloc3*0 #[xc,yc] - [xd, yd]
+#u3 = analyticSolution(xcolloc3, ycolloc3, indexType)
+du4 = ycolloc4-math.pi/2 #[xd,yd] - [xa, ya]
+#u4 = analyticSolution(xcolloc4, ycolloc4, indexType)
+
+dudn_bc = np.concatenate((du1, du2, du3, du4))
+xindex = np.linspace(0, 1, len(dudn_bc))
 # plot the discretized domain
 if (plotMesh==1):
     plt.plot(x1, y1, x2, y2, x3, y3, x4, y4)
@@ -162,9 +176,9 @@ if (plotMesh==1):
     plt.show()
 
 if (plotBC == 1):
-    plt.plot(xindex, u_bc, xindex, u_bc, 'bo')
+    plt.plot(xindex, dudn_bc, xindex, dudn_bc, 'bo')
     plt.grid(linestyle='-', linewidth=0.5)
-    plt.title('Neumann boundary conditions')
+    plt.title('neumann boundary conditions')
     plt.show()
 
 #===============================================================================
@@ -173,7 +187,8 @@ if (plotAnalyticSolution==1):
     xanal = np.linspace(xa, xb, 100)
     yanal = np.linspace(ya, yc, 100)
     xx, yy = np.meshgrid(xanal, yanal)
-    uanal = analyticSolution(xx,yy)
+    indexType =2
+    uanal = analyticSolution(xx,yy, indexType)
     plt.contourf(xx,yy,uanal)
 
     fig = plt.figure()
@@ -186,7 +201,6 @@ if (plotAnalyticSolution==1):
 
 #===============================================================================
 # BOUNDARY ELEMENT METHOD (BEM) BOYNDARY INTEGRAL EQUATION IN MATRIX FORM
-"""
 sizeA = len(xcolloc)
 Abij = np.zeros((sizeA, sizeA)) #G
 Bbij = np.zeros((sizeA, sizeA)) #dGdn
@@ -206,31 +220,42 @@ for ii in range(0, sizeA): #for each collocation point
         deltaKronecker = 0
         if (ii == jj):
             deltaKronecker = 1
-        A[ii][jj] = 0.5*deltaKronecker + Bbij[ii][jj]
-        S[ii][jj] = Abij[ii][jj]
+        A[ii][jj] = Abij[ii][jj]
+        S[ii][jj] = 0.5*deltaKronecker + Bbij[ii][jj]
 
 #===============================================================================
 # SOLUTION OF THE LINEAR SYSTEM
-b = np.matmul(A, u_bc)
-dudn_bc = np.linalg.solve(S,b)
+b = np.matmul(A, dudn_bc)
+u_bc = np.linalg.solve(S,b)
 #===============================================================================
 # COMPARISON WITH THE ANALYTIC SOLUTION
 if (plotNumResultsBC==1):
     xindex = np.linspace(0, 1, len(xcolloc))
-    plt.plot(xindex, u_bc)
-    plt.plot(xindex, u_bc, 'bo', label='dirichlet data')
+    #plt.plot(xindex, u_bc)
+    #plt.plot(xindex, u_bc, 'bo', label='dirichlet data')
     plt.plot(xindex, dudn_bc, 'r*', label='neumann data')
     strLabel = 'Collocation points counter-clockwise indexing from (' + str(xa) + ',' + str(ya) +')'
     plt.xlabel(strLabel);
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper right', borderaxespad=0.)
     plt.grid(linestyle='-', linewidth=0.5)
     plt.show()
+
+    xindex = np.linspace(0, 1, len(xcolloc))
+    plt.plot(xindex, u_bc)
+    plt.plot(xindex, u_bc, 'bo', label='dirichlet data')
+    strLabel = 'Collocation points counter-clockwise indexing from (' + str(xa) + ',' + str(ya) +')'
+    plt.xlabel(strLabel);
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper right', borderaxespad=0.)
+    plt.grid(linestyle='-', linewidth=0.5)
+    plt.show()
+
 #===============================================================================
 # DOMAIN SOLUTION u(x,y)
-xtest = np.linspace(xa+0.01, xb-0.01, 20)
-ytest = np.linspace(ya+0.01, yc-0.01, 20)
+xtest = np.linspace(xa+0.0001, xb-0.0001, Np)
+ytest = np.linspace(ya+0.0001, yc-0.0001, Np)
 xnum, ynum = np.meshgrid(xtest, ytest)
-uactual = np.sinh(ynum)*np.sin(xnum)/math.sinh(1)
+indexType = 2
+uactual = analyticSolution(xnum, ynum, indexType)
 
 unum = np.zeros((len(xtest), len(ytest)))
 
@@ -264,8 +289,20 @@ if (plotAnalyticSolution==1):
     ax.set_zlabel('Z axis')
     plt.show()
 
+constant1 = np.max(unum)
+constant2 = np.max(uactual)
+print(constant1) #numerical
+print(constant2) #uanalytical
+if (constant1<constant2):
+    unum = unum + abs(constant2-constant1)
+elif (constant1>constant2):
+    unum = unum - abs(constant2-constant1)
+
+constant3 = np.max(unum)
+print(constant3)
+
 totalError = np.max(np.abs(unum - uactual))
 message1 = 'Number of elements = ' + str(4*Np) + ', maxError = ' + str(totalError)
 print(message1)
+
 #===============================================================================
-"""
