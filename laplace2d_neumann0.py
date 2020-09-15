@@ -116,7 +116,7 @@ plotBC = 1
 plotNumericalSolution = 1
 plotNumResultsBC = 1
 
-Np = 300 #number of nodes
+Np = 150 #number of nodes
 # square domain creation
 xa, ya = 0, 0
 xb, yb = math.pi, 0
@@ -251,14 +251,15 @@ if (plotNumResultsBC==1):
 
 #===============================================================================
 # DOMAIN SOLUTION u(x,y)
-xtest = np.linspace(xa+0.0001, xb-0.0001, Np)
-ytest = np.linspace(ya+0.0001, yc-0.0001, Np)
+xtest = np.linspace(xa+0.0001, xb-0.0001, 10)
+ytest = np.linspace(ya+0.0001, yc-0.0001, 10)
 xnum, ynum = np.meshgrid(xtest, ytest)
 indexType = 2
 uactual = analyticSolution(xnum, ynum, indexType)
 
 unum = np.zeros((len(xtest), len(ytest)))
 
+#index0 = 0
 for kk in range(0, len(xtest)):
     for ll in range(0, len(ytest)):
         # for each point in the meshgrid
@@ -270,7 +271,8 @@ for kk in range(0, len(xtest)):
             SL = constantStrengthSource(x1, y1, x2, y2, xp, yp) # (G)
             DL = constantStrengthDoublet(x1, y1, x2, y2, xp, yp) #(dG/dn)
             utemporary = utemporary + dudn_bc[jj]*SL - u_bc[jj]*DL
-
+            #index0 += 1
+            #print(index0)
         unum[kk,ll]=utemporary
 
 if (plotAnalyticSolution==1):
@@ -304,5 +306,7 @@ print(constant3)
 totalError = np.max(np.abs(unum - uactual))
 message1 = 'Number of elements = ' + str(4*Np) + ', maxError = ' + str(totalError)
 print(message1)
+
+print('Simulation when OK!')
 
 #===============================================================================
