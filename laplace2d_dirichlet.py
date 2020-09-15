@@ -93,18 +93,20 @@ def collocationScheme(xi, yi):
 
     return xcolloc, ycolloc, nx, ny, tx, ty
 
-def show():
-   return matplotlib.pyplot.show(block=True)
+#def show():
+#   return matplotlib.pyplot.show(block=True)
 
 #===============================================================================
 # MAIN CODE
 #===============================================================================
 # CREATE MESH FOR SQUARE DOMAIN & BOYNDARY CONDITIONS
-plotMesh = 1
+plotMesh = 0
 plotAnalyticSolution = 0
-plotBC = 1
+plotBC = 0
+plotNumericalSolution = 0
+plotNumResultsBC = 0
 
-Np = 20 #number of nodes
+Np = 150 #number of nodes
 # square domain creation
 xa, ya = 0, 0
 xb, yb = math.pi, 0
@@ -143,12 +145,12 @@ if (plotMesh==1):
     plt.quiver(xcolloc, ycolloc, tx, ty)
     plt.grid(linestyle='-', linewidth=0.5)
     plt.title('Nodes, control points and orientation vectors')
-    show()
+    plt.show()
 
 if (plotBC == 1):
     plt.plot(xindex, u_bc, xindex, u_bc, 'bo')
     plt.title('Dirichlet boundary conditions')
-    show()
+    plt.show()
 
 #===============================================================================
 # ANALYTIC SOLUTION PREVIEW
@@ -197,20 +199,23 @@ b = np.matmul(A, u_bc)
 dudn_bc = np.linalg.solve(S,b)
 #===============================================================================
 # COMPARISON WITH THE ANALYTIC SOLUTION
-xindex = np.linspace(0, 1, len(xcolloc))
-plt.plot(xindex, u_bc)
-plt.plot(xindex, u_bc, 'bo', label='dirichlet data')
-plt.plot(xindex, dudn_bc, 'r*', label='neumann data')
-strLabel = 'Collocation points counter-clockwise indexing from (' + str(xa) + ',' + str(ya) +')'
-plt.xlabel(strLabel);
-plt.legend(bbox_to_anchor=(1.05, 1), loc='upper right', borderaxespad=0.)
-plt.grid(linestyle='-', linewidth=0.5)
-show()
+if (plotNumResultsBC==1):
+    xindex = np.linspace(0, 1, len(xcolloc))
+    plt.plot(xindex, u_bc)
+    plt.plot(xindex, u_bc, 'bo', label='dirichlet data')
+    plt.plot(xindex, dudn_bc, 'r*', label='neumann data')
+    strLabel = 'Collocation points counter-clockwise indexing from (' + str(xa) + ',' + str(ya) +')'
+    plt.xlabel(strLabel);
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper right', borderaxespad=0.)
+    plt.grid(linestyle='-', linewidth=0.5)
+    plt.show()
 #===============================================================================
 # DOMAIN SOLUTION u(x,y)
 xtest = np.linspace(xa+0.01, xb-0.01, 20)
 ytest = np.linspace(ya+0.01, yc-0.01, 20)
 xnum, ynum = np.meshgrid(xtest, ytest)
+uactual = np.sinh(ynum)*np.sin(xnum)/math.sinh(1)
+
 unum = np.zeros((len(xtest), len(ytest)))
 
 for kk in range(0, len(xtest)):
@@ -227,18 +232,23 @@ for kk in range(0, len(xtest)):
 
         unum[kk,ll]=utemporary
 
-plt.contourf(xtest,ytest,unum)
-plt.grid(linestyle='-', linewidth=0.5)
-plt.xlabel('x-axis')
-plt.ylabel('y-axis')
-show()
+if (plotAnalyticSolution==1):
+    plt.contourf(xtest,ytest,unum)
+    plt.grid(linestyle='-', linewidth=0.5)
+    plt.xlabel('x-axis')
+    plt.ylabel('y-axis')
+    plt.show()
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.plot_surface(xnum, ynum, unum, cmap=cm.coolwarm,
-                       linewidth=0, antialiased=False)
-ax.set_xlabel('X axis')
-ax.set_ylabel('Y axis')
-ax.set_zlabel('Z axis')
-plt.show()
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_surface(xnum, ynum, unum, cmap=cm.coolwarm,
+                           linewidth=0, antialiased=False)
+    ax.set_xlabel('X axis')
+    ax.set_ylabel('Y axis')
+    ax.set_zlabel('Z axis')
+    plt.show()
+
+totalError = np.max(np.abs(unum - uactual))
+message1 = 'Number of elements = ' + str(4*Np) + ', maxError = ' + str(totalError)
+print(message1)
 #===============================================================================
