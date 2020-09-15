@@ -106,7 +106,7 @@ plotBC = 0
 plotNumericalSolution = 0
 plotNumResultsBC = 0
 
-Np = 150 #number of nodes
+Np = 100 #number of nodes
 # square domain creation
 xa, ya = 0, 0
 xb, yb = math.pi, 0
