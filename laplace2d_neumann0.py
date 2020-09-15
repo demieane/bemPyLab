@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 #===============================================================================
-# COMMENTS: solution of Laplace in 2d with dirichlet boundary conditions
+# COMMENTS: solution of Laplace in 2d with neumann boundary conditions
 # Last review at 15-9-2020
 # Written by: Anevlavi Dimitra
 #
@@ -93,20 +93,27 @@ def collocationScheme(xi, yi):
 
     return xcolloc, ycolloc, nx, ny, tx, ty
 
-#def show():
-#   return matplotlib.pyplot.show(block=True)
+def analyticSolution(xx,yy):
+    uu = np.zeros((len(xx), len(yy)))
+    # for the infinite series we take nterms = 10 terms
+    nterms = 20
+    PI = math.pi
+    for N in range(1, nterms):
+        a_n = 2*(1-(-1)**N)/(N**3*PI*math.tanh(N*PI))
+        uu = uu + a_n*(np.cosh(N*xx)-np.tanh(N*PI)*np.sinh(N*xx))*np.cos(N*yy)
+    return uu
 
 #===============================================================================
 # MAIN CODE
 #===============================================================================
 # CREATE MESH FOR SQUARE DOMAIN & BOYNDARY CONDITIONS
-plotMesh = 0
-plotAnalyticSolution = 0
-plotBC = 0
+plotMesh = 1
+plotAnalyticSolution = 1
+plotBC = 1
 plotNumericalSolution = 0
 plotNumResultsBC = 0
 
-Np = 150 #number of nodes
+Np =20 #number of nodes
 # square domain creation
 xa, ya = 0, 0
 xb, yb = math.pi, 0
@@ -122,16 +129,23 @@ xi = np.concatenate((x1, x2[1:len(x2)], x3[1:len(x3)], x4[1:len(x4)]))
 yi = np.concatenate((y1, y2[1:len(y2)], y3[1:len(y3)], y4[1:len(y4)]))
 
 [xcolloc, ycolloc, nx, ny, tx, ty] = collocationScheme(xi, yi)
+xcolloc1 = xcolloc[0:(Np-1)]
+xcolloc2 = xcolloc[(Np-1):(2*(Np-1))]
 xcolloc3 = xcolloc[2*(Np-1):3*(Np-1)]
+xcolloc4 = xcolloc[3*(Np-1):len(xcolloc)]
+
+ycolloc4 = ycolloc[3*(Np-1):len(ycolloc)]
+
 #Boundary conditions
 #   D---------------C
 #   -               -
 #   -               -
 #   A---------------B
-u_bc1 = np.zeros(Np-1) #[xa,ya] - [xb, yb]
-u_bc2 = np.zeros(Np-1) #[xb,yb] - [xc, yc]
-u_bc3 = np.sin(xcolloc3) #[xc,yc] - [xd, yd]
-u_bc4 = np.zeros(Np-1) #[xd,yd] - [xa, ya]
+u_bc1 = xcolloc1 #[xa,ya] - [xb, yb]
+u_bc2 = np.zeros(len(xcolloc2)) #[xb,yb] - [xc, yc]
+u_bc3 = xcolloc3 #[xc,yc] - [xd, yd]
+u_bc4 = ycolloc4-math.pi/2 #[xd,yd] - [xa, ya]
+
 u_bc = np.concatenate((u_bc1, u_bc2, u_bc3, u_bc4))
 xindex = np.linspace(0, 1, len(u_bc))
 # plot the discretized domain
@@ -149,7 +163,8 @@ if (plotMesh==1):
 
 if (plotBC == 1):
     plt.plot(xindex, u_bc, xindex, u_bc, 'bo')
-    plt.title('Dirichlet boundary conditions')
+    plt.grid(linestyle='-', linewidth=0.5)
+    plt.title('Neumann boundary conditions')
     plt.show()
 
 #===============================================================================
@@ -158,7 +173,7 @@ if (plotAnalyticSolution==1):
     xanal = np.linspace(xa, xb, 100)
     yanal = np.linspace(ya, yc, 100)
     xx, yy = np.meshgrid(xanal, yanal)
-    uanal = np.sinh(yy)*np.sin(xx)/math.sinh(1)
+    uanal = analyticSolution(xx,yy)
     plt.contourf(xx,yy,uanal)
 
     fig = plt.figure()
@@ -171,6 +186,7 @@ if (plotAnalyticSolution==1):
 
 #===============================================================================
 # BOUNDARY ELEMENT METHOD (BEM) BOYNDARY INTEGRAL EQUATION IN MATRIX FORM
+"""
 sizeA = len(xcolloc)
 Abij = np.zeros((sizeA, sizeA)) #G
 Bbij = np.zeros((sizeA, sizeA)) #dGdn
@@ -252,3 +268,4 @@ totalError = np.max(np.abs(unum - uactual))
 message1 = 'Number of elements = ' + str(4*Np) + ', maxError = ' + str(totalError)
 print(message1)
 #===============================================================================
+"""
