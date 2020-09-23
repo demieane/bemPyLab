@@ -100,11 +100,11 @@ def collocationScheme(xi, yi):
 # MAIN CODE
 #===============================================================================
 # CREATE MESH FOR SQUARE DOMAIN & BOYNDARY CONDITIONS
-plotMesh = 0
-plotAnalyticSolution = 0
-plotBC = 0
-plotNumericalSolution = 0
-plotNumResultsBC = 0
+plotMesh = 1
+plotAnalyticSolution = 1
+plotBC = 1
+plotNumericalSolution = 1
+plotNumResultsBC = 1
 
 Np = 100 #number of nodes
 # square domain creation
