@@ -1,17 +1,14 @@
 #===============================================================================
 import numpy as np
-import math
 import matplotlib
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 #===============================================================================
-# COMMENTS: solution of Laplace in 2d with dirichlet boundary conditions
-# Last review at 15-9-2020
-# Written by: Anevlavi Dimitra
+# Prediction of the wave resistance of a bluff body
 #
-# The normal vector direction does not affect the result. What happens with
-# the Neumann problem??
+# Last review at 11-2-2020
+# Written by: Anevlavi Dimitra
 #===============================================================================
 
 def constantStrengthSource(x1, y1, x2, y2, xp, yp):
@@ -75,7 +72,7 @@ def collocationScheme(xi, yi):
         xcolloc[ii] = 0.5*(xi[ii+1]+xi[ii])
         ycolloc[ii] = 0.5*(yi[ii+1]+yi[ii])
 
-        lpanel = math.sqrt((xi[ii+1]-xi[ii])**2+(yi[ii+1]-yi[ii])**2) #panel length
+        lpanel = np.sqrt((xi[ii+1]-xi[ii])**2+(yi[ii+1]-yi[ii])**2) #panel length
         sin_theta[ii] = (yi[ii+1]-yi[ii])/lpanel
         cos_theta[ii] = (xi[ii+1]-xi[ii])/lpanel
 
@@ -86,67 +83,72 @@ def collocationScheme(xi, yi):
         #ty[ii] = nx[ii]
 
         # The normal vector inside the domain
-        nx[ii] = -sin_theta[ii]
-        ny[ii] = cos_theta[ii]
-        tx[ii] = ny[ii]
-        ty[ii] = -nx[ii]
+        nx[ii] = sin_theta[ii]
+        ny[ii] = -cos_theta[ii]
+        tx[ii] = -ny[ii]
+        ty[ii] = nx[ii]
 
     return xcolloc, ycolloc, nx, ny, tx, ty
-
-#def show():
-#   return matplotlib.pyplot.show(block=True)
 
 #===============================================================================
 # MAIN CODE
 #===============================================================================
 # CREATE MESH FOR SQUARE DOMAIN & BOYNDARY CONDITIONS
 plotMesh = 1
-plotAnalyticSolution = 1
-plotBC = 1
-plotNumericalSolution = 1
-plotNumResultsBC = 1
+debuggTool = 1
 
-Np = 100 #number of nodes
-# square domain creation
-xa, ya = 0, 0
-xb, yb = math.pi, 0
-xc, yc = math.pi, 1
-xd, yd = 0, 1
-[x1, y1] =lineParametrization(xa, ya, xb, yb, Np) #y=0
-[x2, y2] =lineParametrization(xb, yb, xc, yc, Np) #x=pi
-[x3, y3] =lineParametrization(xc, yc, xd, yd, Np) #y=1
-[x4, y4] =lineParametrization(xd, yd, xa, ya, Np) #x=0
+R = 1 #radius of cylinder
+h = 2*R #cylinder submergence
 
-#nodes on the boundary with counter-clockwise numbering
-xi = np.concatenate((x1, x2[1:len(x2)], x3[1:len(x3)], x4[1:len(x4)]))
-yi = np.concatenate((y1, y2[1:len(y2)], y3[1:len(y3)], y4[1:len(y4)]))
+Np1  = 10 #number of nodes on free-surface
+Np2  = 10 #number of nodes on cylinder
 
-[xcolloc, ycolloc, nx, ny, tx, ty] = collocationScheme(xi, yi)
-xcolloc3 = xcolloc[2*(Np-1):3*(Np-1)]
-#Boundary conditions
-#   D---------------C
-#   -               -
-#   -               -
-#   A---------------B
-u_bc1 = np.zeros(Np-1) #[xa,ya] - [xb, yb]
-u_bc2 = np.zeros(Np-1) #[xb,yb] - [xc, yc]
-u_bc3 = np.sin(xcolloc3) #[xc,yc] - [xd, yd]
-u_bc4 = np.zeros(Np-1) #[xd,yd] - [xa, ya]
-u_bc = np.concatenate((u_bc1, u_bc2, u_bc3, u_bc4))
-xindex = np.linspace(0, 1, len(u_bc))
+# free domain creation
+xa, ya, xb, yb = 2, 0, -14, 0
+[x1, y1] =lineParametrization(xa, ya, xb, yb, Np1)
+
+# cylinder surface
+theta = np.linspace(2*np.pi, 0, Np2)
+x2 = R*np.cos(theta)
+y2 = R*np.sin(theta) - h
+
+#nodes on the boundary with clockwise numbering
+[xcolloc1, ycolloc1, nx1, ny1, tx1, ty1] = collocationScheme(x1, y1)
+[xcolloc2, ycolloc2, nx2, ny2, tx2, ty2] = collocationScheme(x2, y2)
+
+#make numpy array
+
+xi = np.array([x1,x2])
+yi = np.array([y1,y2])
+
+if debuggTool == 1:
+    print("First row of xi -> free surface x-nodes \n", xi[0])
+    print("Second row of xi -> cylinder x-nodes \n", xi[1])
+
+xcolloc = np.array([xcolloc1,xcolloc2])
+ycolloc = np.array([ycolloc1,ycolloc2])
+nx = np.array([nx1,nx2])
+ny = np.array([ny1,ny2])
+tx = np.array([tx1,tx2])
+ty = np.array([ty1,ty2])
+
 # plot the discretized domain
 if (plotMesh==1):
-    plt.plot(x1, y1, x2, y2, x3, y3, x4, y4)
-    plt.plot(x1, y1, 'bo', x2, y2, 'bo', x3, y3, 'bo', x4, y4, 'bo')
-    plt.plot(xa, ya, 'r*', xb, yb, 'r*', xc, yc, 'r*', xd, yd, 'r*')
+    plt.plot(xi[0], yi[0], xi[1], yi[1])
+    plt.plot(xi[0], yi[0], 'bo', xi[1], yi[1], 'ro')
+
     plt.grid(linestyle='-', linewidth=0.5)
-    plt.plot(xcolloc, ycolloc, 'gs')
-    plt.quiver(xcolloc, ycolloc, nx, ny)
-    plt.quiver(xcolloc, ycolloc, tx, ty)
+    plt.plot(xcolloc[0], ycolloc[0], 'gs', xcolloc[1], ycolloc[1], 'gs')
+    plt.quiver(xcolloc[0][0], ycolloc[0][0], nx[0][0], ny[0][0])
+    plt.quiver(xcolloc[1][0], ycolloc[1][0], nx[1][0], ny[1][0])
+    plt.quiver(xcolloc[0][0], ycolloc[0][0], tx[0][0], ty[0][0])
+    plt.quiver(xcolloc[1][0], ycolloc[1][0], tx[1][0], ty[1][0])
     plt.grid(linestyle='-', linewidth=0.5)
     plt.title('Nodes, control points and orientation vectors')
+    plt.axis("equal")
     plt.show()
 
+"""
 if (plotBC == 1):
     plt.plot(xindex, u_bc, xindex, u_bc, 'bo')
     plt.title('Dirichlet boundary conditions')
@@ -251,4 +253,5 @@ if (plotAnalyticSolution==1):
 totalError = np.max(np.abs(unum - uactual))
 message1 = 'Number of elements = ' + str(4*Np) + ', maxError = ' + str(totalError)
 print(message1)
+"""
 #===============================================================================
