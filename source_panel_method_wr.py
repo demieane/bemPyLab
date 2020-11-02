@@ -114,7 +114,7 @@ xa, ya, xb, yb = 3, 0, -15, 0
 
 # cylinder surface
 theta = np.linspace(2*np.pi, 0, Np2)
-dll = 0.5*(2*R)*abs(theta[1]-theta[0]) #ds approximation
+dll = R*abs(theta[1]-theta[0]) #ds approximation
 x2 = R*np.cos(theta)
 y2 = R*np.sin(theta) - h
 
@@ -275,7 +275,7 @@ for i in range(len(xcolloc[0][:])): # for every panel on the free surface bounda
 # SOLUTION OF THE LINEAR SYSTEM
 #===============================================================================
 S = np.linalg.solve(Am,Bv)
-print("solution", S)
+#print("solution", S)
 
 #===============================================================================
 # POST-PROCESSING
@@ -284,7 +284,7 @@ Potx = -U + np.matmul(xalfa,S) #the defivative of potential in x
 Poty = np.matmul(yalfa,S) #the defivative of potential in z direction
 Cp = 1-(Potx**2+Poty**2)/U**2
 eta = (U/gi)*(Potx[1:Nfs]+U) # free surface elevation
-print("eta", eta)
+#print("eta", eta)
 
 plt.plot( xcolloc[0][0:Nfs-1], eta, 'b--', label='heta')
 plt.plot( xcolloc[0][:], ycolloc[0][:], 'k')
@@ -298,19 +298,19 @@ plt.grid(linestyle='-', linewidth=0.5)
 plt.show()
 
 # analytic solution for the pressure coefficient around the cylinder
-print(theta)
+#print(theta)
 start = len(theta)
-print(theta[0:start-1])
-print(theta[1:start])
+#print(theta[0:start-1])
+#print(theta[1:start])
 thi = 0.5*(theta[0:start-1] + theta[1:start])
 
 uanal=U*(-1-np.cos(-math.pi+2*thi));
 vanal=U*np.sin(-math.pi+2*thi);
 Cpa=1-(uanal**2+vanal**2)/U**2;
 
-print(Nfs)
-print(Nbody)
-print(Cp)
+#print(Nfs)
+#print(Nbody)
+#print(Cp)
 
 plt.plot( xi[1][0:2], yi[1][0:2], 'bo')
 plt.plot( xi[1][:], yi[1][:], 'k')
@@ -328,4 +328,10 @@ plt.show()
 
 # Calculate resistance
 #?? Look up for dll
+temp = np.multiply(Cp[Nfs:len(Cp)], nx[1][:])
+
+print("1))) = ", Cp[Nfs:len(Cp)])
+print("2))) = ", nx[1][:])
+Resistance = dll*np.sum(temp)
+print(Resistance)
 #===============================================================================
