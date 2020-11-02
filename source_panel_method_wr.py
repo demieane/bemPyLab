@@ -96,7 +96,7 @@ def collocationScheme(xi, yi):
 # CREATE MESH FOR SQUARE DOMAIN & BOYNDARY CONDITIONS
 #===============================================================================
 plotMesh = 1
-debuggTool = 0
+debuggTool = 1
 
 R = 0.5 #radius of cylinder
 h = 2*R #cylinder submergence
@@ -105,8 +105,8 @@ gi = 9.81
 U = Froude*np.sqrt(gi*h)
 kappa = gi/U**2
 
-Np1  = 10 #number of nodes on free-surface
-Np2  = 5 #number of nodes on cylinder
+Np1  = 100 #number of nodes on free-surface
+Np2  = 50 #number of nodes on cylinder
 
 # free domain creation
 xa, ya, xb, yb = 3, 0, -15, 0
@@ -114,6 +114,7 @@ xa, ya, xb, yb = 3, 0, -15, 0
 
 # cylinder surface
 theta = np.linspace(2*np.pi, 0, Np2)
+dll = 0.5*(2*R)*abs(theta[1]-theta[0]) #ds approximation
 x2 = R*np.cos(theta)
 y2 = R*np.sin(theta) - h
 
@@ -134,6 +135,7 @@ if debuggTool == 1:
 xcolloc = np.array([xcolloc1,xcolloc2])
 ycolloc = np.array([ycolloc1,ycolloc2])
 Nel = len(xcolloc[0][:]) + len(xcolloc[1][:])
+Nfs = len(xcolloc[0][:]); Nbody = len(xcolloc[1][:])
 
 if debuggTool == 1: print(Nel)
 
@@ -251,7 +253,7 @@ for i in range(len(xcolloc[0][:])): # for every panel on the free surface bounda
         xp3 = xp2 - delx
         xp4 = xp3 - delx
         #xp1=xm(ir); xp2=xp1-delx; xp3=xp2-delx; xp4=xp3-delx;
-    print("\n", xp1, xp2, xp3, xp4, irDawson)
+    #print("\n", xp1, xp2, xp3, xp4, irDawson)
     Di  =  (xp2-xp1)*(xp3-xp1)*(xp4-xp1)*(xp4-xp2)*(xp3-xp2)*(xp4-xp3)*(xp4+xp3+xp2-3*xp1);
     CDi =  ((xp2-xp1)**2)*((xp3-xp1)**2)*(xp3-xp2)*(xp3+xp2-2*xp1)/Di;
     CCi = -((xp2-xp1)**2)*((xp4-xp1)**2)*(xp4-xp2)*(xp4+xp2-2*xp1)/Di;
@@ -259,180 +261,71 @@ for i in range(len(xcolloc[0][:])): # for every panel on the free surface bounda
     CAi =  -(CBi+CCi+CDi);
     p1  =  CAi; p2  =  CBi;
     p3  =  CCi; p4  =  CDi;
-    print(p1, p2, p3, p4)
+    #print(p1, p2, p3, p4)
     for mm in range(Nel):
         pol1=0;
-        if ir>3:
+        if irDawson>3:
             pol1 = p1*xalfa[ir][mm] + p2*xalfa[ir-1][mm] + p3*xalfa[ir-2][mm]+ p4*xalfa[ir-3][mm];
         Am[ir][mm] = Am[ir][mm] + pol1/kappa;
 
 #print("Am", Am)
-print(Am[3][:])
-
-
-
-
-
-
+#print(Am[3][:])
 
 #===============================================================================
 # SOLUTION OF THE LINEAR SYSTEM
 #===============================================================================
 S = np.linalg.solve(Am,Bv)
 print("solution", S)
-"""
-kel=0;
-for isec = 1:2 % for each boundary
-
-for i = 1:N(isec) % for every panel on that boundary
-kel = kel+1;
-% collocation point
-xp = xm(kel);
-yp = ym(kel);
-
-jel=0;
-% calculate the effect from constant-source distributions
-for jsec = 1:2 % from the other boundaries and from itself
-
-    for j = 1:N(jsec) % panel-wise
-        jel = jel+1;
-        xi1 = xi(jsec,j);
-        yi1 = yi(jsec,j);
-        xi2 = xi(jsec,j+1);
-        yi2 = yi(jsec,j+1);
-        % from sources
-            f = SL(xi1,yi1,xi2,yi2,xp,yp);
-            up = f(1);
-            vp = f(2);
-            % save values of matrices
-            Potm(kel,jel) = f(3); %from the integral expressions
-            xalfa(kel,jel) = f(1); %velocities due to sinks U
-            yalfa(kel,jel) = f(2); %velocities due to sinks V
-
-        if kel == jel % for self induced velocities expression on the boundary
-            % save values of matrices
-            xalfa(kel,jel) = -0.5*npx(kel);%sinks
-            yalfa(kel,jel) = -0.5*npy(kel);
-        end
-
-        un(kel,jel) = up*npx(kel) + vp*npy(kel);
-
-    end;
-end;
-
-end;
-end
-
-"""
-
-
-
-
-
-"""
-if (plotBC == 1):
-    plt.plot(xindex, u_bc, xindex, u_bc, 'bo')
-    plt.title('Dirichlet boundary conditions')
-    plt.show()
 
 #===============================================================================
-# ANALYTIC SOLUTION PREVIEW
-if (plotAnalyticSolution==1):
-    xanal = np.linspace(xa, xb, 100)
-    yanal = np.linspace(ya, yc, 100)
-    xx, yy = np.meshgrid(xanal, yanal)
-    uanal = np.sinh(yy)*np.sin(xx)/math.sinh(1)
-    plt.contourf(xx,yy,uanal)
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(xx, yy, uanal, cmap=cm.coolwarm,linewidth=0, antialiased=False)
-    ax.set_xlabel('X axis')
-    ax.set_ylabel('Y axis')
-    ax.set_zlabel('Z axis')
-    plt.show()
-
+# POST-PROCESSING
 #===============================================================================
-# BOUNDARY ELEMENT METHOD (BEM) BOYNDARY INTEGRAL EQUATION IN MATRIX FORM
-sizeA = len(xcolloc)
-Abij = np.zeros((sizeA, sizeA)) #G
-Bbij = np.zeros((sizeA, sizeA)) #dGdn
-#udirichlet = np.zeros((sizeA,1))
-A = np.zeros((sizeA, sizeA))
-S = np.zeros((sizeA, sizeA))
+Potx = -U + np.matmul(xalfa,S) #the defivative of potential in x
+Poty = np.matmul(yalfa,S) #the defivative of potential in z direction
+Cp = 1-(Potx**2+Poty**2)/U**2
+eta = (U/gi)*(Potx[1:Nfs]+U) # free surface elevation
+print("eta", eta)
 
-for ii in range(0, sizeA): #for each collocation point
-    for jj in range(0, sizeA): #we evaluate the effect each panel
-        # on each panel we have a piecewise-constat distribution of
-        # sources (G) and dipoles (dG/dn)
-        xp, yp = xcolloc[ii], ycolloc[ii]
-        x1, y1 = xi[jj], yi[jj]
-        x2, y2 = xi[jj+1], yi[jj+1]
-        Abij[ii][jj] = constantStrengthSource(x1, y1, x2, y2, xp, yp)
-        Bbij[ii][jj] = constantStrengthDoublet(x1, y1, x2, y2, xp, yp)
-        deltaKronecker = 0
-        if (ii == jj):
-            deltaKronecker = 1
-        A[ii][jj] = 0.5*deltaKronecker + Bbij[ii][jj]
-        S[ii][jj] = Abij[ii][jj]
+plt.plot( xcolloc[0][0:Nfs-1], eta, 'b--', label='heta')
+plt.plot( xcolloc[0][:], ycolloc[0][:], 'k')
+plt.plot( xcolloc[1][:], ycolloc[1][:])
+plt.axis("equal")
+plt.title("FIGURE.2 Free surface elevation")
+plt.xlabel("x [m]")
+plt.ylabel("z [m]")
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper right', borderaxespad=0.)
+plt.grid(linestyle='-', linewidth=0.5)
+plt.show()
 
-#===============================================================================
-# SOLUTION OF THE LINEAR SYSTEM
-b = np.matmul(A, u_bc)
-dudn_bc = np.linalg.solve(S,b)
-#===============================================================================
-# COMPARISON WITH THE ANALYTIC SOLUTION
-if (plotNumResultsBC==1):
-    xindex = np.linspace(0, 1, len(xcolloc))
-    plt.plot(xindex, u_bc)
-    plt.plot(xindex, u_bc, 'bo', label='dirichlet data')
-    plt.plot(xindex, dudn_bc, 'r*', label='neumann data')
-    strLabel = 'Collocation points counter-clockwise indexing from (' + str(xa) + ',' + str(ya) +')'
-    plt.xlabel(strLabel);
-    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper right', borderaxespad=0.)
-    plt.grid(linestyle='-', linewidth=0.5)
-    plt.show()
-#===============================================================================
-# DOMAIN SOLUTION u(x,y)
-xtest = np.linspace(xa+0.01, xb-0.01, 20)
-ytest = np.linspace(ya+0.01, yc-0.01, 20)
-xnum, ynum = np.meshgrid(xtest, ytest)
-uactual = np.sinh(ynum)*np.sin(xnum)/math.sinh(1)
+# analytic solution for the pressure coefficient around the cylinder
+print(theta)
+start = len(theta)
+print(theta[0:start-1])
+print(theta[1:start])
+thi = 0.5*(theta[0:start-1] + theta[1:start])
 
-unum = np.zeros((len(xtest), len(ytest)))
+uanal=U*(-1-np.cos(-math.pi+2*thi));
+vanal=U*np.sin(-math.pi+2*thi);
+Cpa=1-(uanal**2+vanal**2)/U**2;
 
-for kk in range(0, len(xtest)):
-    for ll in range(0, len(ytest)):
-        # for each point in the meshgrid
-        utemporary = 0
-        xp = xtest[ll]; yp = ytest[kk];
-        for jj in range(0, len(xcolloc)):
-            x1, y1 = xi[jj], yi[jj]
-            x2, y2 = xi[jj+1], yi[jj+1]
-            SL = constantStrengthSource(x1, y1, x2, y2, xp, yp) # (G)
-            DL = constantStrengthDoublet(x1, y1, x2, y2, xp, yp) #(dG/dn)
-            utemporary = utemporary + dudn_bc[jj]*SL - u_bc[jj]*DL
+print(Nfs)
+print(Nbody)
+print(Cp)
 
-        unum[kk,ll]=utemporary
+plt.plot( xi[1][0:2], yi[1][0:2], 'bo')
+plt.plot( xi[1][:], yi[1][:], 'k')
+plt.show()
 
-if (plotAnalyticSolution==1):
-    plt.contourf(xtest,ytest,unum)
-    plt.grid(linestyle='-', linewidth=0.5)
-    plt.xlabel('x-axis')
-    plt.ylabel('y-axis')
-    plt.show()
+plt.plot(thi, Cp[Nfs:len(Cp)], 'bo', label="numerical")
+plt.plot(thi, Cp[Nfs:len(Cp)], 'b')
+plt.plot(thi, Cpa, label='analytic')
+plt.title("FIGURE.1 Pressure coefficient around the cylinder")
+plt.xlabel("theta (deg)")
+plt.ylabel("Cp")
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper right', borderaxespad=0.)
+plt.grid(linestyle='-', linewidth=0.5)
+plt.show()
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(xnum, ynum, unum, cmap=cm.coolwarm,
-                           linewidth=0, antialiased=False)
-    ax.set_xlabel('X axis')
-    ax.set_ylabel('Y axis')
-    ax.set_zlabel('Z axis')
-    plt.show()
-
-totalError = np.max(np.abs(unum - uactual))
-message1 = 'Number of elements = ' + str(4*Np) + ', maxError = ' + str(totalError)
-print(message1)
-"""
+# Calculate resistance
+#?? Look up for dll
 #===============================================================================
