@@ -78,12 +78,6 @@ def collocationScheme(xi, yi):
         sin_theta[ii] = (yi[ii+1]-yi[ii])/lpanel
         cos_theta[ii] = (xi[ii+1]-xi[ii])/lpanel
 
-        ## The normal vector outside the domain
-        #nx[ii] = sin_theta[ii]
-        #ny[ii] = -cos_theta[ii]
-        #tx[ii] = -ny[ii]
-        #ty[ii] = nx[ii]
-
         # The normal vector inside the domain
         nx[ii] = sin_theta[ii]
         ny[ii] = -cos_theta[ii]
@@ -95,8 +89,9 @@ def collocationScheme(xi, yi):
 #===============================================================================
 # CREATE MESH FOR SQUARE DOMAIN & BOYNDARY CONDITIONS
 #===============================================================================
-plotMesh = 1
-debuggTool = 1
+plotMesh = 0 #Switch to 1 to view the mesh plot
+plotResults = 0 #Switch to 1 to view the results plotted
+debuggTool = 0 #Switch to 1 to enable debugg mode
 
 R = 0.5 #radius of cylinder
 h = 2*R #cylinder submergence
@@ -105,8 +100,10 @@ gi = 9.81
 U = Froude*np.sqrt(gi*h)
 kappa = gi/U**2
 
+
 Np1  = 100 #number of nodes on free-surface
 Np2  = 50 #number of nodes on cylinder
+print("Mesh consists of ", Np1, " nodes on the free-surface (FS) and ", Np2, " on the body (B)")
 
 # free domain creation
 xa, ya, xb, yb = 3, 0, -15, 0
@@ -183,28 +180,18 @@ Potm = np.zeros((Nel, Nel))
 xalfa = np.zeros((Nel, Nel))
 yalfa = np.zeros((Nel, Nel))
 un = np.zeros((Nel, Nel))
-#print("Nel", Nel)
-#print("un", un)
+
 kel = -1
 for isec in range(2): #for every boundary [0, 1]
-    #print("BOUNDARY isec:", isec)
     for i in range(len(xcolloc[isec][:])): # for every panel on that boundary
         kel = kel + 1
-        #print("index = ", i, " xi=", xcolloc[isec][i])
-        #print("kel", kel)
         xp = xcolloc[isec][i];  yp = ycolloc[isec][i]
         jel = -1
         for jsec in range(2): #[0, 1]
-            #print("BOUNDARY jsec:", jsec)
             for j in range(len(xcolloc[jsec][:])):
                 jel = jel + 1
-                #print("index = ", i, " xi=", xi[jsec][j])
-                #print("jel", jel)
                 f = constantStrengthSource(xi[jsec][j], yi[jsec][j], xi[jsec][j+1], yi[jsec][j+1], xp, yp)
-
-                fi = f[0]
-                up = f[1]
-                vp = f[2]
+                fi = f[0]; up = f[1]; vp = f[2]
                 Potm[kel][jel] = fi
                 xalfa[kel][jel] = up
                 yalfa[kel][jel] = vp
@@ -216,7 +203,6 @@ for isec in range(2): #for every boundary [0, 1]
                 #print("matrix: ", kel, jel)
 
                 un[kel][jel] = up*nx[isec][i] + vp*ny[isec][i]
-                #print("RESULTS", un[kel][jel], xi[jsec][j], yi[jsec][j], xi[jsec][j+1], yi[jsec][j+1], xp, yp)
 
 if debuggTool == 1: print("LHS Matrix =>", un)
 Am = un
@@ -225,11 +211,9 @@ Am = un
 # DAWSON FINITE DIFFERENT SCHEME
 #===============================================================================
 delx = xcolloc[0][0]-xcolloc[0][1]
-print("delx", delx)
 for i in range(len(xcolloc[0][:])): # for every panel on the free surface boundary
     ir = len(xcolloc[0][:])-1 -i;
     irDawson = ir + 1
-    print("i", i, "ir", ir)
     if irDawson>3:
         xp1 = xcolloc[0][ir]
         xp2 = xcolloc[0][ir-1]
@@ -240,42 +224,37 @@ for i in range(len(xcolloc[0][:])): # for every panel on the free surface bounda
         xp2 = xcolloc[0][ir-1]
         xp3 = xcolloc[0][ir-2]
         xp4 = xp3 - delx
-        #xp1=xm(ir); xp2=xm(ir-1); xp3=xm(ir-2); xp4=xp3-delx;
     if irDawson==2:
         xp1 = xcolloc[0][ir]
         xp2 = xcolloc[0][ir-1]
         xp3 = xp2 - delx
         xp4 = xp3 - delx
-        #xp1=xm(ir); xp2=xm(ir-1); xp3=xp2-delx; xp4=xp3-delx;
     if irDawson==1:
         xp1 = xcolloc[0][ir]
         xp2 = xp1 - delx
         xp3 = xp2 - delx
         xp4 = xp3 - delx
-        #xp1=xm(ir); xp2=xp1-delx; xp3=xp2-delx; xp4=xp3-delx;
-    #print("\n", xp1, xp2, xp3, xp4, irDawson)
-    Di  =  (xp2-xp1)*(xp3-xp1)*(xp4-xp1)*(xp4-xp2)*(xp3-xp2)*(xp4-xp3)*(xp4+xp3+xp2-3*xp1);
-    CDi =  ((xp2-xp1)**2)*((xp3-xp1)**2)*(xp3-xp2)*(xp3+xp2-2*xp1)/Di;
-    CCi = -((xp2-xp1)**2)*((xp4-xp1)**2)*(xp4-xp2)*(xp4+xp2-2*xp1)/Di;
-    CBi =  ((xp3-xp1)**2)*((xp4-xp1)**2)*(xp4-xp3)*(xp4+xp3-2*xp1)/Di;
-    CAi =  -(CBi+CCi+CDi);
-    p1  =  CAi; p2  =  CBi;
-    p3  =  CCi; p4  =  CDi;
-    #print(p1, p2, p3, p4)
-    for mm in range(Nel):
-        pol1=0;
-        if irDawson>3:
-            pol1 = p1*xalfa[ir][mm] + p2*xalfa[ir-1][mm] + p3*xalfa[ir-2][mm]+ p4*xalfa[ir-3][mm];
-        Am[ir][mm] = Am[ir][mm] + pol1/kappa;
 
-#print("Am", Am)
-#print(Am[3][:])
+    for mm in range(Nel):
+        pol1=0
+        if irDawson>3:
+            #print("\n", xp1, xp2, xp3, xp4, irDawson)
+            Di  =  (xp2-xp1)*(xp3-xp1)*(xp4-xp1)*(xp4-xp2)*(xp3-xp2)*(xp4-xp3)*(xp4+xp3+xp2-3*xp1)
+            CDi =  ((xp2-xp1)**2)*((xp3-xp1)**2)*(xp3-xp2)*(xp3+xp2-2*xp1)/Di
+            CCi = -((xp2-xp1)**2)*((xp4-xp1)**2)*(xp4-xp2)*(xp4+xp2-2*xp1)/Di
+            CBi =  ((xp3-xp1)**2)*((xp4-xp1)**2)*(xp4-xp3)*(xp4+xp3-2*xp1)/Di
+            CAi =  -(CBi+CCi+CDi);
+            p1  =  CAi; p2  =  CBi;
+            p3  =  CCi; p4  =  CDi;
+            pol1 = p1*xalfa[ir][mm] + p2*xalfa[ir-1][mm] + p3*xalfa[ir-2][mm]+ p4*xalfa[ir-3][mm]
+
+        Am[ir][mm] = Am[ir][mm] + pol1/kappa;
 
 #===============================================================================
 # SOLUTION OF THE LINEAR SYSTEM
 #===============================================================================
 S = np.linalg.solve(Am,Bv)
-#print("solution", S)
+if debuggTool==1: print("The piecewise-constant source density vector is: ", S)
 
 #===============================================================================
 # POST-PROCESSING
@@ -284,54 +263,48 @@ Potx = -U + np.matmul(xalfa,S) #the defivative of potential in x
 Poty = np.matmul(yalfa,S) #the defivative of potential in z direction
 Cp = 1-(Potx**2+Poty**2)/U**2
 eta = (U/gi)*(Potx[1:Nfs]+U) # free surface elevation
-#print("eta", eta)
 
-plt.plot( xcolloc[0][0:Nfs-1], eta, 'b--', label='heta')
-plt.plot( xcolloc[0][:], ycolloc[0][:], 'k')
-plt.plot( xcolloc[1][:], ycolloc[1][:])
-plt.axis("equal")
-plt.title("FIGURE.2 Free surface elevation")
-plt.xlabel("x [m]")
-plt.ylabel("z [m]")
-plt.legend(bbox_to_anchor=(1.05, 1), loc='upper right', borderaxespad=0.)
-plt.grid(linestyle='-', linewidth=0.5)
-plt.show()
+if plotResults == 1:
+    plt.plot( xcolloc[0][0:Nfs-1], eta, 'b--', label='heta')
+    plt.plot( xcolloc[0][:], ycolloc[0][:], 'k')
+    plt.plot( xi[1][:], yi[1][:])
+    plt.axis("equal")
+    plt.title("FIGURE.2 Free surface elevation")
+    plt.xlabel("x [m]")
+    plt.ylabel("z [m]")
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper right', borderaxespad=0.)
+    plt.grid(linestyle='-', linewidth=0.5)
+    plt.show()
 
 # analytic solution for the pressure coefficient around the cylinder
 #print(theta)
 start = len(theta)
-#print(theta[0:start-1])
-#print(theta[1:start])
 thi = 0.5*(theta[0:start-1] + theta[1:start])
+uanal=U*(-1-np.cos(-math.pi+2*thi))
+vanal=U*np.sin(-math.pi+2*thi)
+Cpa=1-(uanal**2+vanal**2)/U**2
 
-uanal=U*(-1-np.cos(-math.pi+2*thi));
-vanal=U*np.sin(-math.pi+2*thi);
-Cpa=1-(uanal**2+vanal**2)/U**2;
+if debuggTool == 1:
+    plt.plot( xi[1][0:2], yi[1][0:2], 'bo')
+    plt.plot( xi[1][:], yi[1][:], 'k')
+    plt.show()
 
-#print(Nfs)
-#print(Nbody)
-#print(Cp)
-
-plt.plot( xi[1][0:2], yi[1][0:2], 'bo')
-plt.plot( xi[1][:], yi[1][:], 'k')
-plt.show()
-
-plt.plot(thi, Cp[Nfs:len(Cp)], 'bo', label="numerical")
-plt.plot(thi, Cp[Nfs:len(Cp)], 'b')
-plt.plot(thi, Cpa, label='analytic')
-plt.title("FIGURE.1 Pressure coefficient around the cylinder")
-plt.xlabel("theta (deg)")
-plt.ylabel("Cp")
-plt.legend(bbox_to_anchor=(1.05, 1), loc='upper right', borderaxespad=0.)
-plt.grid(linestyle='-', linewidth=0.5)
-plt.show()
+if plotResults == 1:
+    plt.plot(thi, Cp[Nfs:len(Cp)], 'bo', label="numerical")
+    plt.plot(thi, Cp[Nfs:len(Cp)], 'b')
+    plt.plot(thi, Cpa, label='analytic')
+    plt.title("FIGURE.1 Pressure coefficient around the cylinder")
+    plt.xlabel("theta (deg)")
+    plt.ylabel("Cp")
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper right', borderaxespad=0.)
+    plt.grid(linestyle='-', linewidth=0.5)
+    plt.show()
 
 # Calculate resistance
-#?? Look up for dll
-temp = np.multiply(Cp[Nfs:len(Cp)], nx[1][:])
-
-print("1))) = ", Cp[Nfs:len(Cp)])
-print("2))) = ", nx[1][:])
-Resistance = dll*np.sum(temp)
-print(Resistance)
+# Cp: one column array
+# nx[1][:]: one row array
+temp = np.matmul(nx[1][:], Cp[Nfs:len(Cp)] )
+waveResistance = dll*np.sum(temp)
+print("The (non-dimensional) wave resistance of the body is:", waveResistance)
+print("Simulation OK...")
 #===============================================================================
