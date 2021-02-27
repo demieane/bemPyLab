@@ -10,9 +10,14 @@ The materials are distributed publicly and openly under a Creative Commons Attri
 
 - [tutorial1_fdm](https://nbviewer.jupyter.org/github/demieane/bemPyLab/blob/master/tutorial1_fdm.ipynb): For those who are not familiar with the Python programming language, and quite a bit rusty in terms of using the finite difference method (perhaps the holy grail of numerical methods for solving PDEs).
 
-**Module 2: Boundary element methods for the Laplace equation in 2D**
+**Module 2: Basic 2D fluid flows**
+- Rankine oval
+- Source and sink pair
+- Superposition principle
+
+**Module 3: Boundary element methods for the Laplace equation in 2D**
 
 - tutorial2.1: The interior Laplace problem in 2D with Dirichlet boundary conditions - laplace2d_dirichlet01.py
 - tutorial2.2: The interior Laplace problem in 2D with Neumann boundary conditions - laplace2d_neumann01.py
 
-**Module 3: Source-panel method for the prediction of wave resistance of a bluff body**
+**Module 4: Source-panel method for the prediction of wave resistance of a bluff body**
