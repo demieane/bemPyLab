@@ -8,7 +8,7 @@ The materials are distributed publicly and openly under a Creative Commons Attri
 
 **Module 1: Numerical methods in a nutshell**
 
-- tutorial01_fdm: For those who are not familiar with the Python programming language, and quite a bit rusty in terms of using the finite difference method (perhaps the holy grail of numerical methods for solving PDEs).
+- [tutorial1_fdm](https://nbviewer.jupyter.org/github/demieane/bemPyLab/blob/master/tutorial1_fdm.ipynb): For those who are not familiar with the Python programming language, and quite a bit rusty in terms of using the finite difference method (perhaps the holy grail of numerical methods for solving PDEs).
 
 **Module 2: Boundary element methods for the Laplace equation in 2D**
 
