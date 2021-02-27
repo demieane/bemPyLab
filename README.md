@@ -12,7 +12,7 @@ The materials are distributed publicly and openly under a Creative Commons Attri
 
 **Module 2: Boundary element methods for the Laplace equation in 2D**
 
-- tutorial2.1: The interior Laplace problem in 2D with Dirichlet boundary conditions: numerical solution using BEM and comparison with the analytic solution
-- tutorial2.2: The interior Laplace problem in 2D with Neumann boundary conditions
+- tutorial2.1: The interior Laplace problem in 2D with Dirichlet boundary conditions - laplace2d_dirichlet01.py
+- tutorial2.2: The interior Laplace problem in 2D with Neumann boundary conditions - laplace2d_neumann01.py
 
 **Module 3: Source-panel method for the prediction of wave resistance of a bluff body**
