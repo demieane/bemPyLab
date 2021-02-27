@@ -13,7 +13,7 @@ The materials are distributed publicly and openly under a Creative Commons Attri
 **Module 2: Basic 2D fluid flows**
 - Rankine oval
 - Source and sink pair
-- Superposition principle
+- [Superposition principle](https://nbviewer.jupyter.org/github/demieane/bemPyLab/blob/master/L3_superposition_principle.ipynb)
 
 **Module 3: Boundary element methods for the Laplace equation in 2D**
 
