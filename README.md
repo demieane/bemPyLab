@@ -21,16 +21,26 @@ Assignment01
 - Source and sink pair
 - [Superposition principle](https://nbviewer.jupyter.org/github/demieane/bemPyLab/blob/master/L3_superposition_principle.ipynb)
 
-### Module 3: BEMs for 2D Laplace
+## Direct BEMs
+
+### Module 3: Source-panel method for the prediction of wave resistance of a bluff body
+Non-lifting flows
+
+### Module 4: Hess-Smith method for 2D lifting flows
+
+### Module 5: Vortex Lattice Method for 3D lifting flows
+
+## Indirect BEMs
+
+### Module 5: BEMs for 2D Laplace
 Direct method based on the velocity potential
 
 - tutorial2.1: The interior Laplace problem in 2D with Dirichlet boundary conditions - laplace2d_dirichlet01.py
 - tutorial2.2: The interior Laplace problem in 2D with Neumann boundary conditions - laplace2d_neumann01.py
 
-### Module 4: Source-panel method for the prediction of wave resistance of a bluff body
-Non-lifting flows
+### Module 6: Morino Method
 
-### Module 5: Hess-Smith method for 2D lifting flows
+
 
 ### Module 6: Direct boundary element method for 2D lifting flows - Morino
 
