@@ -8,39 +8,36 @@ The materials are distributed publicly and openly under a Creative Commons Attri
 
 ## List of Notebooks
 
-0. Getting Started
-
-### Module 1: Numerical methods in a nutshell
+### 0. Getting Started
 
 - [tutorial1_fdm](https://nbviewer.jupyter.org/github/demieane/bemPyLab/blob/master/tutorial1_fdm.ipynb): For those who are not familiar with the Python programming language, and quite a bit rusty in terms of using the finite difference method (perhaps the holy grail of numerical methods for solving PDEs).
 
-### Module 2: Elementary 2D fluid flows
-Assignment01
+### Module 1: Elementary potential flows
 
 - Rankine oval
 - Source and sink pair
 - [Superposition principle](https://nbviewer.jupyter.org/github/demieane/bemPyLab/blob/master/L3_superposition_principle.ipynb)
 
-## Direct BEMs
+### Module 2: Source panel methods 
+Application of BEM for the wave resistance problem of a bluff body
 
-### Module 3: Source-panel method for the prediction of wave resistance of a bluff body
-Non-lifting flows
+### Module 3: Source-vortex panel methods
+Hess-Smith method for 2D lifting flows
+(Assignment - Compare the results obtained with BEM with thin airfoil theory, [XFOIL](https://web.mit.edu/drela/Public/web/xfoil/) and experimental data found in literature)
 
-### Module 4: Hess-Smith method for 2D lifting flows
+### Module 4: Vortex Lattice Method (VLM)
+Hydrodynamic load prediction for 3D lifting flows around wings
+(Assignment - Compare the results obtained with VLM with lifting-line theory)
 
-### Module 5: Vortex Lattice Method for 3D lifting flows
-
-## Indirect BEMs
-
-### Module 5: BEMs for 2D Laplace
-Direct method based on the velocity potential
+### Module 5: Greens theorem-based BEM for 2D Laplace
 
 - tutorial2.1: The interior Laplace problem in 2D with Dirichlet boundary conditions - laplace2d_dirichlet01.py
 - tutorial2.2: The interior Laplace problem in 2D with Neumann boundary conditions - laplace2d_neumann01.py
 
 ### Module 6: Morino Method
 
+### Module 7: Advanced topics 
+- Singular integral calculation
+- Higher-order BEMs
 
-
-### Module 6: Direct boundary element method for 2D lifting flows - Morino
 
