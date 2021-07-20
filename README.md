@@ -10,27 +10,27 @@ The materials are distributed publicly and openly under a Creative Commons Attri
 
 0. Getting Started
 
-#### Module 1: Numerical methods in a nutshell
+### Module 1: Numerical methods in a nutshell
 
 - [tutorial1_fdm](https://nbviewer.jupyter.org/github/demieane/bemPyLab/blob/master/tutorial1_fdm.ipynb): For those who are not familiar with the Python programming language, and quite a bit rusty in terms of using the finite difference method (perhaps the holy grail of numerical methods for solving PDEs).
 
-**Module 2: Basic 2D fluid flows**
+### Module 2: Elementary 2D fluid flows
 Assignment01
 
 - Rankine oval
 - Source and sink pair
 - [Superposition principle](https://nbviewer.jupyter.org/github/demieane/bemPyLab/blob/master/L3_superposition_principle.ipynb)
 
-**Module 3: Boundary element methods for the Laplace equation in 2D**
+### Module 3: BEMs for 2D Laplace
 Direct method based on the velocity potential
 
 - tutorial2.1: The interior Laplace problem in 2D with Dirichlet boundary conditions - laplace2d_dirichlet01.py
 - tutorial2.2: The interior Laplace problem in 2D with Neumann boundary conditions - laplace2d_neumann01.py
 
-**Module 4: Source-panel method for the prediction of wave resistance of a bluff body**
+### Module 4: Source-panel method for the prediction of wave resistance of a bluff body
 Non-lifting flows
 
-**Module 5: Hess-Smith method for 2D lifting flows**
+### Module 5: Hess-Smith method for 2D lifting flows
 
-**Module 6: Direct boundary element method for 2D lifting flows - Morino**
+### Module 6: Direct boundary element method for 2D lifting flows - Morino
 
